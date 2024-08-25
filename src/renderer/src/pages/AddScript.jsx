@@ -1,0 +1,92 @@
+import { useState } from 'react'
+import { IoIosArrowBack } from 'react-icons/io'
+import { useNavigate } from 'react-router-dom'
+import { Editor } from '@monaco-editor/react'
+import DropDown from '../components/dropDown'
+
+function AddScript() {
+  const ipc = window.ipcRenderer
+  const [code, setCode] = useState('')
+  const navigate = useNavigate()
+  const [language, setLanguage] = useState('python')
+  const changeLanguage = (lang) => {
+    if (lang !== language) {
+      setLanguage(lang)
+    }
+  }
+  const options = [
+    {
+      label: 'Python',
+      value: 'python'
+    },
+    {
+      label: 'NodeJS',
+      value: 'javascript'
+    },
+    {
+      label: 'Bash',
+      value: 'bash'
+    }
+  ]
+
+  const defaultOption = options[0]
+  return (
+    <div className="h-full w-full p-8 overflow-scroll">
+      <button
+        onClick={() => {
+          navigate('/')
+        }}
+        className="bg-[#34424d] p-[0.5em] rounded-md flex items-center gap-2 hover:bg-[#3e515f] transition-colors  ease-in-out active:bg-[#313d46] mb-4"
+      >
+        <IoIosArrowBack />
+      </button>
+      <div className="w-full flex h-max justify-between mb-4">
+        <input
+          type="text"
+          name="name"
+          placeholder="Name"
+          className="bg-transparent h-max w-[48%] p-4 pt-2 pb-2 border border-solid border-[#34424d] rounded-md focus:outline-none"
+        />
+        <textarea
+          name="description"
+          placeholder="Description"
+          className="bg-transparent w-[48%] p-4 pt-2 pb-2 border border-solid border-[#34424d] rounded-md focus:outline-none min-h-11 max-h-32 h-11"
+        ></textarea>
+      </div>
+      <div className="bg-transparent h-80 w-full border border-solid border-[#34424d] rounded-md mb-4">
+        <Editor
+          height="100%"
+          defaultLanguage={language}
+          theme="vs-dark"
+          value={code}
+          onChange={(value) => setCode(value)}
+        />
+      </div>
+      <div className="mb-4">
+        <DropDown options={options} defaultOption={defaultOption} setLang={changeLanguage} />
+      </div>
+      <div className="mb-4">
+        run after
+        <input
+          type="number"
+          name="run-after"
+          placeholder="Run after"
+          className="bg-transparent w-[10%] p-4 pt-2 pb-2 border border-solid border-[#34424d] rounded-md focus:outline-none"
+        />
+      </div>
+      <div>
+        <button
+          className="bg-[#34424d] w-full h-max p-3 rounded-md flex justify-center items-center hover:bg-[#3e515f] transition-colors ease-in-out active:bg-[#313d46] mb-4"
+          onClick={() => {
+            console.log(code, language)
+            ipc.send('notify')
+          }}
+        >
+          Add Script
+        </button>
+      </div>
+    </div>
+  )
+}
+
+export default AddScript
