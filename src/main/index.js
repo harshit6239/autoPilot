@@ -1,10 +1,12 @@
 import { app, shell, BrowserWindow, ipcMain, Notification, Tray, Menu } from 'electron'
 import { join } from 'path'
+import ScriptScheduler from './lib/index.js'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
 let mainWindow
 let tray = null
+let scriptScheduler = null
 
 function createTray() {
   // Create a tray icon
@@ -81,7 +83,9 @@ function showNotification(title, body) {
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
-
+  if (!scriptScheduler) {
+    scriptScheduler = new ScriptScheduler()
+  }
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
@@ -94,6 +98,16 @@ app.whenReady().then(() => {
 
   ipcMain.on('notify', () => {
     showNotification('Auto Pilot', 'Script added successfully')
+  })
+
+  ipcMain.handle('getScripts', () => {
+    console.log(scriptScheduler.scripts)
+    return scriptScheduler.scripts
+  })
+
+  ipcMain.on('addScript', (_, script) => {
+    // scriptScheduler.addScript(script)
+    console.log(script)
   })
 
   ipcMain.on('minimizeApp', () => {
@@ -114,8 +128,6 @@ app.whenReady().then(() => {
     createTray()
     showNotification('Auto Pilot', 'Auto Pilot is running in the background')
   })
-
-  ipcMain.handle('getScripts')
 
   createWindow()
 

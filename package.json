@@ -21,8 +21,12 @@
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^3.0.0",
     "@monaco-editor/react": "^4.6.0",
+    "@nextui-org/theme": "^2.2.11",
     "electron-updater": "^6.1.7",
-    "react-router-dom": "^6.26.0"
+    "framer-motion": "^11.5.4",
+    "node-schedule": "^2.1.1",
+    "react-router-dom": "^6.26.0",
+    "short-unique-id": "^5.2.0"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^1.0.2",
@@ -35,13 +39,13 @@
     "electron-vite": "^2.3.0",
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.3",
-    "postcss": "^8.4.41",
+    "postcss": "^8.4.47",
     "prettier": "^3.3.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.2.1",
     "tailwind-merge": "^2.4.0",
-    "tailwindcss": "^3.4.7",
+    "tailwindcss": "^3.4.12",
     "vite": "^5.3.1"
   }
 }

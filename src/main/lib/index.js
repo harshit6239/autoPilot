@@ -1,28 +1,50 @@
-import { homedir } from 'os'
+import { app } from 'electron'
+// import { Notification, app } from 'electron'
+// import { spawn } from 'child_process'
+// import scheduleJob from 'node-schedule'
 import fs from 'fs'
-import { ensureDir, readdir } from 'fs-extra'
-import { appDirectoryName } from '../../shared/constants'
+import path from 'path'
+import ShortUniqueId from 'short-unique-id'
 
-export const getRootDir = () => `${homedir()}/${appDirectoryName}`
+const userDataPath = app.getPath('userData')
+const scriptsFilePath = path.join(userDataPath, 'scripts.json')
 
-export const getScripts = async () => {
-  const rootDir = getRootDir()
-  await ensureDir(rootDir)
-  const scripts = await readdir(rootDir, {
-    encoding: 'utf-8',
-    withFileTypes: false
-  })
-  return scripts.filter((script) => script.endsWith('.json'))
+function loadScripts() {
+  console.log('scriptsFilePath', scriptsFilePath)
+  if (!fs.existsSync(scriptsFilePath)) {
+    fs.writeFileSync(scriptsFilePath, JSON.stringify([]), 'utf-8')
+  }
+  const scripts = JSON.parse(fs.readFileSync(scriptsFilePath))
+  return scripts
 }
 
-export const saveScript = async (data) => {
-  const rootDir = getRootDir()
-  await ensureDir(rootDir)
-  const JSONobj = JSON.stringify(data, null, 2)
-  try {
-    fs.writeFileSync(`${rootDir}/${data.name}.json`, JSONobj)
-    return true
-  } catch (err) {
-    return false
+export default class ScriptScheduler {
+  constructor() {
+    this.scripts = loadScripts()
+    this.activeScripts = this.scripts.filter((script) => script.active)
+    this.uid = new ShortUniqueId()
+  }
+
+  saveScripts() {
+    fs.writeFileSync(scriptsFilePath, JSON.stringify(this.scripts), 'utf-8')
+  }
+
+  addScript(script) {
+    this.scripts.push({ id: this.uid.rnd(), ...script })
+    this.saveScripts()
+    this.activeScripts = this.scripts.filter((script) => script.active)
+  }
+
+  removeScript(id) {
+    this.scripts = this.scripts.filter((script) => script.id !== id)
+    this.saveScripts()
+    this.activeScripts = this.scripts.filter((script) => script.active)
+  }
+
+  toggleScript(id) {
+    const script = this.scripts.find((script) => script.id === id)
+    script.active = !script.active
+    this.saveScripts()
+    this.activeScripts = this.scripts.filter((script) => script.active)
   }
 }
