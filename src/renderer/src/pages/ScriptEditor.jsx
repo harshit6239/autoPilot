@@ -3,16 +3,28 @@ import { IoIosArrowBack } from 'react-icons/io'
 import { useNavigate } from 'react-router-dom'
 import { Editor } from '@monaco-editor/react'
 import DropDown from '../components/dropDown'
+import { useParams } from 'react-router-dom'
+import useScriptsStore from '../hooks/useScriptsStore'
 
-function AddScript() {
+function ScriptEditor() {
+  const { id } = useParams()
   const ipc = window.ipcRenderer
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const [code, setCode] = useState('')
-  const [runAt, setRunAt] = useState('')
-  const [active, setActive] = useState(false)
+  const store = useScriptsStore()
   const navigate = useNavigate()
-  const [language, setLanguage] = useState('python')
+  let script = {}
+  if (id) {
+    script = store.scripts.find((s) => s.id === id)
+    if (!script) {
+      navigate('/')
+    }
+  }
+  const [error, setError] = useState('')
+  const [name, setName] = useState(id ? script.name : '')
+  const [description, setDescription] = useState(id ? script.description : '')
+  const [code, setCode] = useState(id ? script.code : '')
+  const [runAt, setRunAt] = useState(id ? script.runAt : '')
+  const [active, setActive] = useState(id ? script.active : false)
+  const [language, setLanguage] = useState(id ? script.language : 'python')
   const changeLanguage = (lang) => {
     if (lang !== language) {
       setLanguage(lang)
@@ -32,15 +44,14 @@ function AddScript() {
       value: 'bash'
     }
   ]
-
-  const defaultOption = options[0]
+  const defaultOption = options.find((o) => o.value === language)
   return (
     <div className="h-full w-full p-8 overflow-scroll">
       <button
         onClick={() => {
           navigate('/')
         }}
-        className="bg-[#34424d] p-[0.5em] rounded-md flex items-center gap-2 hover:bg-[#3e515f] transition-colors  ease-in-out active:bg-[#313d46] mb-4"
+        className="bg-[#34424d] p-[0.5em] rounded-md flex items-center gap-2 hover:bg-[#3e515f] transition-colors ease-in-out active:bg-[#313d46] mb-4"
       >
         <IoIosArrowBack />
       </button>
@@ -70,17 +81,17 @@ function AddScript() {
           onChange={(value) => setCode(value)}
         />
       </div>
-      <div className="mb-4">
+      <div className="mb-4 flex justify-between">
         <DropDown options={options} defaultOption={defaultOption} setLang={changeLanguage} />
+        <input
+          type="time"
+          value={runAt}
+          className="bg-[#34424d] p-2 border border-solid border-[#34424d] rounded-md focus:outline-none text-white"
+          onChange={(e) => {
+            setRunAt(e.target.value)
+          }}
+        />
       </div>
-      <input
-        type="number"
-        name="runAt"
-        value={runAt}
-        placeholder="Run At"
-        className="bg-transparent w-[20%] mb-4 p-4 pt-2 pb-2 border border-solid border-[#34424d] rounded-md focus:outline-none"
-        onChange={(e) => setRunAt(e.target.value)}
-      />
       <div className="mb-4 flex gap-2 items-center">
         <input
           type="checkbox"
@@ -93,34 +104,43 @@ function AddScript() {
           Active
         </label>
       </div>
+      <div className="text-red-600 text-center mb-4">{error}</div>
       <div>
         <button
           className="bg-[#34424d] w-full h-max p-3 rounded-md flex justify-center items-center hover:bg-[#3e515f] transition-colors ease-in-out active:bg-[#313d46] mb-4"
           onClick={() => {
-            console.log({
-              name,
-              description,
-              code,
-              language,
-              runAt,
-              active
-            })
-            ipc.send('addScript', {
-              name,
-              description,
-              code,
-              language,
-              runAt,
-              active
-            })
+            if (!name || !description || !code || !language || !runAt) {
+              setError('All fields are required')
+              return
+            }
+            if (id) {
+              ipc.send('updateScript', {
+                id,
+                name,
+                description,
+                code,
+                language,
+                runAt,
+                active
+              })
+            } else {
+              ipc.send('addScript', {
+                name,
+                description,
+                code,
+                language,
+                runAt,
+                active
+              })
+            }
             navigate('/')
           }}
         >
-          Add Script
+          {id ? 'Update' : 'Add'} Script
         </button>
       </div>
     </div>
   )
 }
 
-export default AddScript
+export default ScriptEditor

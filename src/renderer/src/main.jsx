@@ -3,7 +3,7 @@ import './assets/main.css'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import Nav from './components/nav'
-import AddScript from './pages/AddScript'
+import ScriptEditor from './pages/ScriptEditor'
 import App from './App'
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
@@ -15,7 +15,11 @@ const router = createBrowserRouter([
   },
   {
     path: '/add',
-    element: <AddScript />
+    element: <ScriptEditor />
+  },
+  {
+    path: '/edit/:id',
+    element: <ScriptEditor />
   }
 ])
 

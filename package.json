@@ -21,12 +21,13 @@
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^3.0.0",
     "@monaco-editor/react": "^4.6.0",
-    "@nextui-org/theme": "^2.2.11",
     "electron-updater": "^6.1.7",
     "framer-motion": "^11.5.4",
     "node-schedule": "^2.1.1",
+    "prop-types": "^15.8.1",
     "react-router-dom": "^6.26.0",
-    "short-unique-id": "^5.2.0"
+    "short-unique-id": "^5.2.0",
+    "zustand": "^5.0.0-rc.2"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^1.0.2",

@@ -93,21 +93,31 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  // ipcMain.on('ping', () => console.log('pong'))
-
   ipcMain.on('notify', () => {
     showNotification('Auto Pilot', 'Script added successfully')
   })
 
   ipcMain.handle('getScripts', () => {
-    console.log(scriptScheduler.scripts)
+    // console.log(scriptScheduler.scripts)
     return scriptScheduler.scripts
   })
 
   ipcMain.on('addScript', (_, script) => {
-    // scriptScheduler.addScript(script)
-    console.log(script)
+    scriptScheduler.addScript(script)
+    // console.log(script)
+  })
+
+  ipcMain.on('updateScript', (_, script) => {
+    scriptScheduler.updateScript(script)
+    // console.log(script)
+  })
+
+  ipcMain.on('removeScript', (_, id) => {
+    scriptScheduler.removeScript(id)
+  })
+
+  ipcMain.on('toggleScript', (_, id) => {
+    scriptScheduler.toggleScript(id)
   })
 
   ipcMain.on('minimizeApp', () => {

@@ -35,6 +35,12 @@ export default class ScriptScheduler {
     this.activeScripts = this.scripts.filter((script) => script.active)
   }
 
+  updateScript(script) {
+    this.scripts = this.scripts.map((s) => (s.id === script.id ? script : s))
+    this.saveScripts()
+    this.activeScripts = this.scripts.filter((script) => script.active)
+  }
+
   removeScript(id) {
     this.scripts = this.scripts.filter((script) => script.id !== id)
     this.saveScripts()
