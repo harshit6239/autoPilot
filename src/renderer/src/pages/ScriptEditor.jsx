@@ -113,25 +113,24 @@ function ScriptEditor() {
               setError('All fields are required')
               return
             }
+
+            // Convert time to cron expression
+            const [hours, minutes] = runAt.split(':')
+            const cronExpression = `${minutes} ${hours} * * *`
+
+            const scriptData = {
+              name,
+              description,
+              code,
+              language,
+              schedule: cronExpression,
+              active
+            }
+
             if (id) {
-              ipc.send('updateScript', {
-                id,
-                name,
-                description,
-                code,
-                language,
-                runAt,
-                active
-              })
+              ipc.send('updateScript', { id, ...scriptData })
             } else {
-              ipc.send('addScript', {
-                name,
-                description,
-                code,
-                language,
-                runAt,
-                active
-              })
+              ipc.send('addScript', scriptData)
             }
             navigate('/')
           }}

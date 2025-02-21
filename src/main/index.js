@@ -93,18 +93,18 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  ipcMain.on('notify', () => {
-    showNotification('Auto Pilot', 'Script added successfully')
+  ipcMain.on('notify', (event, { title, body }) => {
+    showNotification(title, body)
   })
 
   ipcMain.handle('getScripts', () => {
-    // console.log(scriptScheduler.scripts)
-    return scriptScheduler.scripts
+    // Return scripts without the 'job' property
+    return scriptScheduler.scripts.map(({ job, ...script }) => script)
   })
 
   ipcMain.on('addScript', (_, script) => {
     scriptScheduler.addScript(script)
-    // console.log(script)
+    showNotification('Script Added', `New script '${script.name}' has been added.`)
   })
 
   ipcMain.on('updateScript', (_, script) => {
@@ -118,6 +118,12 @@ app.whenReady().then(() => {
 
   ipcMain.on('toggleScript', (_, id) => {
     scriptScheduler.toggleScript(id)
+    const updatedScript = scriptScheduler.scripts.find((s) => s.id === id)
+    if (updatedScript?.active) {
+      showNotification('Script Activated', `Script '${updatedScript.name}' is now active.`)
+    } else {
+      showNotification('Script Deactivated', `Script '${updatedScript.name}' is now inactive.`)
+    }
   })
 
   ipcMain.on('minimizeApp', () => {
